@@ -1,7 +1,7 @@
 {
-    "name": "das-backend",
+    "name": "api-mobile",
     "version": "1.0.0",
-    "description": "Backend para Dental Analytics Safe API",
+    "description": "api-mobile",
     "main": "index.js",
     "scripts": {
         "start": "node index.js",

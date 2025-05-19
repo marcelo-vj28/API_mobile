@@ -40,43 +40,43 @@ const server = http.createServer(async (req, res) => {
     try {
         await client.connect();
         const db = client.db('DentalAnalyticsSafe');  // Nome da base de dados
-        const collection = db.collection('Pacientes');  // Nome da coleção
+        const collection = db.collection('Clinicas');  // Nome da coleção atualizada
 
-        // GET /pacientes (Listar pacientes)
-        if (method === 'GET' && path === '/pacientes') {
+        // GET /clinicas (Listar clínicas)
+        if (method === 'GET' && path === '/clinicas') {
             const query = parsedUrl.query.search
                 ? {
                     $or: [
-                        { nome: { $regex: parsedUrl.query.search, $options: 'i' } },
-                        { cpf: { $regex: parsedUrl.query.search, $options: 'i' } }
+                        { nomeClinica: { $regex: parsedUrl.query.search, $options: 'i' } },
+                        { cnpj: { $regex: parsedUrl.query.search, $options: 'i' } }
                     ]
                 }
                 : {};
-            const pacientes = await collection.find(query).toArray();
+            const clinicas = await collection.find(query).toArray();
             res.writeHead(200);
-            res.end(JSON.stringify(pacientes));
+            res.end(JSON.stringify(clinicas));
         }
-        // GET /pacientes/:id (Buscar paciente por ID)
-        else if (method === 'GET' && path.startsWith('/pacientes/')) {
+        // GET /clinicas/:id (Buscar clínica por ID)
+        else if (method === 'GET' && path.startsWith('/clinicas/')) {
             const id = parsedUrl.pathname.split('/')[2];  // ID vem da URL
-            const paciente = await collection.findOne({ _id: new MongoClient.ObjectID(id) });  // Usando _id para busca no MongoDB
-            if (paciente) {
+            const clinica = await collection.findOne({ _id: new MongoClient.ObjectID(id) });  // Usando _id para busca no MongoDB
+            if (clinica) {
                 res.writeHead(200);
-                res.end(JSON.stringify(paciente));
+                res.end(JSON.stringify(clinica));
             } else {
                 res.writeHead(404);
-                res.end(JSON.stringify({ error: 'Paciente não encontrado' }));
+                res.end(JSON.stringify({ error: 'Clínica não encontrada' }));
             }
         }
-        // POST /pacientes (Criar paciente)
-        else if (method === 'POST' && path === '/pacientes') {
-            const paciente = await getRequestBody(req);
-            const result = await collection.insertOne(paciente);
+        // POST /clinicas (Criar clínica)
+        else if (method === 'POST' && path === '/clinicas') {
+            const clinica = await getRequestBody(req);
+            const result = await collection.insertOne(clinica);
             res.writeHead(201);
             res.end(JSON.stringify({ insertedId: result.insertedId }));
         }
-        // PUT /pacientes/:id (Atualizar paciente)
-        else if (method === 'PUT' && path.startsWith('/pacientes/')) {
+        // PUT /clinicas/:id (Atualizar clínica)
+        else if (method === 'PUT' && path.startsWith('/clinicas/')) {
             const id = parsedUrl.pathname.split('/')[2];
             const updatedData = await getRequestBody(req);
             const result = await collection.updateOne(
@@ -86,8 +86,8 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(200);
             res.end(JSON.stringify({ modifiedCount: result.modifiedCount }));
         }
-        // DELETE /pacientes/:id (Excluir paciente)
-        else if (method === 'DELETE' && path.startsWith('/pacientes/')) {
+        // DELETE /clinicas/:id (Excluir clínica)
+        else if (method === 'DELETE' && path.startsWith('/clinicas/')) {
             const id = parsedUrl.pathname.split('/')[2];
             const result = await collection.deleteOne({ _id: new MongoClient.ObjectID(id) });
             res.writeHead(200);
